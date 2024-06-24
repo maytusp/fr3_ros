@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+      <node name="demo_test_action" 
+            pkg="openvla_real_expr" 
+            type="demo_test_action" 
+            respawn="false" output="screen"  >
+      </node>
+</launch>

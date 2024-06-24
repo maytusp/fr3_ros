@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+      <node name="openvla_action_srv" 
+            pkg="openvla_real_expr" 
+            type="openvla_action_srv.py" 
+            respawn="false" output="screen"  >
+      </node>
+</launch>
