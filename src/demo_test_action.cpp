@@ -393,18 +393,20 @@ int main(int argc, char* argv[])
 
     // int time;
     // time = 0 ;
+    float gripperaction;
+    gripperaction = 1.0;
 
     while(use_pause){
 
         // plan_and_execute_via_waypoints_point(move_group_interface, myplan, 0.015187380684356905, 0.012168297867564626, 0.02424368244643313, -0.00311655245808996, -0.004956759999780139, 0.002097183678518317);
 
-        move_franka(move_group_interface, myplan, 0.015187380684356905, 0.012168297867564626, 0.02424368244643313, 0.00311655245808996, 0.004956759999780139, 0.002097183678518317);
-
+        // move_franka(move_group_interface, myplan, 0.015187380684356905, 0.012168297867564626, 0.02424368244643313, 0.00311655245808996, 0.004956759999780139, 0.002097183678518317);
+// 
         // WaitUserConfirm("[!] pickup [!]"); 
         // pickup_gripper(franka_action_grasp);
 
         // ros::Duration(1).sleep();
-        // move_gripper(1.0, franka_action);
+        move_gripper(gripperaction, franka_action);
 
         // WaitUserConfirm("[!] continue [!]"); 
 
@@ -415,9 +417,11 @@ int main(int argc, char* argv[])
         //     break; // Exit the loop if time exceeds the array bounds
         // }
 
+        gripperaction = 0.0;
+        
         geometry_msgs::Pose new_pose_action = move_group_interface.getCurrentPose().pose;
         cout << "new_pose_action pose:" << new_pose_action.position.x << " , " << new_pose_action.position.y << " , " << new_pose_action.position.z << endl;
-
+        ros::Duration(5).sleep();
     }
     
     return 0;

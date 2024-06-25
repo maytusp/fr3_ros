@@ -268,11 +268,19 @@ double plan_and_execute_via_waypoints_point(moveit::planning_interface::MoveGrou
 	return plan_and_execute_via_waypoints(group, myplan, current_pose, target_pose, num_midpts);
 }
 
-void move_franka(moveit::planning_interface::MoveGroupInterface& move_group_interface, moveit::planning_interface::MoveGroupInterface::Plan& myplan, float yaw_delta, float pitch_delta, float roll_delta, float delta_x, float delta_y, float delta_z){
+void move_franka(moveit::planning_interface::MoveGroupInterface& move_group_interface, moveit::planning_interface::MoveGroupInterface::Plan& myplan, float yaw_delta, float pitch_delta, float roll_delta, float delta_x, float delta_y, float delta_z, int mode){
     geometry_msgs::Pose pose_action = move_group_interface.getCurrentPose().pose;
     double roll, pitch, yaw;
     Quaterion2Euler(pose_action.orientation, roll, pitch, yaw);
     cout << "current roll, pitch, yaw:" << roll << ", " << pitch << ", " << yaw << endl;
+    // mode 0 is for delta pose
+    // mode 1 is for absolutely pose
+
+    if(mode==1){
+        roll = 0;
+        pitch = 0;
+        yaw = 0;
+    }
 
     roll += roll_delta;
     pitch += pitch_delta;
@@ -292,9 +300,18 @@ void move_franka(moveit::planning_interface::MoveGroupInterface& move_group_inte
     pose_action.orientation.z = q_euler.z();
     pose_action.orientation.w = q_euler.w();
 
-    pose_action.position.x = pose_action.position.x + delta_x;
-    pose_action.position.y = pose_action.position.y + delta_y;
-    pose_action.position.z = pose_action.position.z + delta_z;
+    if(mode==0){
+        pose_action.position.x = pose_action.position.x + delta_x;
+        pose_action.position.y = pose_action.position.y + delta_y;
+        pose_action.position.z = pose_action.position.z + delta_z;
+    }
+    else{
+        pose_action.position.x = delta_x;
+        pose_action.position.y = delta_y;
+        pose_action.position.z = delta_z;
+    }
+
+    cout << "movefranka_pose_action pose:" << pose_action.position.x << " , " << pose_action.position.y << " , " << pose_action.position.z << endl;
 
     move_group_interface.setStartState(*move_group_interface.getCurrentState());
     move_group_interface.setPoseTarget(pose_action);
@@ -307,6 +324,17 @@ void move_franka(moveit::planning_interface::MoveGroupInterface& move_group_inte
         return;
     } 
 
+}
+
+void Robot_GotoHome(moveit::planning_interface::MoveGroupInterface& group, moveit::planning_interface::MoveGroupInterface::Plan& myplan) {
+    ROS_INFO("Robot_GotoHome");
+    std::vector<double> command_joint_position = {0, 47 * M_PI/180, 0, -150 * M_PI/180, 0, 103 * M_PI/180, 45 * M_PI/180};
+    // std::vector<double> command_joint_position = {45 * M_PI/180, -19 * M_PI/180, -15 * M_PI/180, -132 * M_PI/180, -5 * M_PI/180, 114 * M_PI/180, 78 * M_PI/180};
+    group.setJointValueTarget(command_joint_position);
+    moveit::core::MoveItErrorCode planning_result = group.plan(myplan);
+    if (planning_result == moveit::planning_interface::MoveItErrorCode::SUCCESS) {
+        group.move();
+    }
 }
 
 int main(int argc, char* argv[])
@@ -355,6 +383,9 @@ int main(int argc, char* argv[])
     ros::Duration(2.0).sleep();  // waiting for publisher
     pub_collision_object.publish(collision_object);
 
+    Robot_GotoHome(move_group_interface, myplan);
+    ros::Duration(1).sleep();
+
     ros::ServiceClient pub_instruction = nh.serviceClient<openvla_real_expr::openvla_instr_srv>("/openvla_real_expr/openvla_instr",true);
     ros::ServiceClient pub_action = nh.serviceClient<openvla_real_expr::openvla_action_srv>("/openvla_real_expr/openvla_action",true);
     ros::Publisher pub_gripper = nh.advertise<std_msgs::String>("/GripperCommand", 1, true);
@@ -366,6 +397,7 @@ int main(int argc, char* argv[])
     std::vector<float> action;
     // float action[7];
     int action_step;
+    int mode;
 
     string instruction;
     std::cout << "User:  " ;
@@ -421,7 +453,8 @@ int main(int argc, char* argv[])
 
         // plan_and_execute_via_waypoints_point(move_group_interface, myplan, action[3], action[4], action[5], action[0], action[1], action[2]);
         // move_franka(move_group_interface, myplan, 0.015187380684356905, 0.012168297867564626, 0.02424368244643313, 0.00311655245808996, 0.004956759999780139, 0.002097183678518317);
-        move_franka(move_group_interface, myplan, action[3], action[4], action[5], action[0], action[1], action[2]);
+        mode = 0;
+        move_franka(move_group_interface, myplan, action[3], action[4], action[5], action[0], action[1], action[2], mode);
         // move_franka(move_group_interface, yaw_delta, pitch_delta, roll_delta, delta_x, delta_y, delta_z);
 
         if(action[6]>=0.5){

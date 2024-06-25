@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+      <node name="demo_generate_cartesian_pose" 
+            pkg="openvla_real_expr" 
+            type="demo_generate_cartesian_pose" 
+            respawn="false" output="screen"  >
+      </node>
+</launch>

@@ -43,7 +43,7 @@ def handle_action(req):
     global s
     global time_step
     global task 
-
+    mode = 1 #TODO Add mode here and send to cpp script 1 is using pose, 0 is using delta pose
     image = req.image
 
     bridge = CvBridge()

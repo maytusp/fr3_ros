@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<launch>
+      <node name="read_rosbag" 
+            pkg="openvla_real_expr" 
+            type="read_rosbag.py" 
+            respawn="false" output="screen"  >
+      </node>
+</launch>

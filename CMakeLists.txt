@@ -185,6 +185,9 @@ include_directories(
 
 add_executable(demo_openvla_real src/demo_openvla_real.cpp)
 add_executable(demo_test_action src/demo_test_action.cpp)
+add_executable(demo_pub_frankastate src/demo_pub_frankastate.cpp)
+#add_executable(demo_replay src/demo_replay.cpp)
+#add_executable(demo_generate_cartesian_pose src/demo_generate_cartesian_pose.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -206,6 +209,24 @@ target_link_libraries(demo_test_action
   ${Boost_LIBRARIES}
   ${OpenCV_LIBS} 
 )
+
+target_link_libraries(demo_pub_frankastate
+  ${catkin_LIBRARIES}
+)
+
+#target_link_libraries(demo_replay
+ # ${catkin_LIBRARIES}
+  #${PCL_LIBRARIES}
+  #${Boost_LIBRARIES}
+  #${OpenCV_LIBS} 
+#)
+
+#target_link_libraries(demo_generate_cartesian_pose
+#  ${catkin_LIBRARIES}
+#  ${PCL_LIBRARIES}
+#  ${Boost_LIBRARIES}
+#  ${OpenCV_LIBS} 
+#)
 #   ${OpenCV_LIBRARIES}
 # install(DIRECTORY launch/
 #     DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
@@ -246,7 +267,15 @@ install(TARGETS demo_test_action
   # RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 
+install(TARGETS demo_pub_frankastate
+  DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+  # ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  # LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
+  # RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
 ## Mark cpp header files for installation
+
 install(DIRECTORY launch
 # include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
